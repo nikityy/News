@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,9 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,6 +50,17 @@ public class ListActivity extends AppCompatActivity
 
         ListView feedItemsList = (ListView) findViewById(R.id.feedItemsList);
         feedItemsList.setAdapter(feedListAdapter);
+
+        // Create a progress bar to display while the list loads
+        ProgressBar progressBar = new ProgressBar(feedItemsList.getContext());
+        progressBar.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT,
+                DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        progressBar.setIndeterminate(true);
+        feedItemsList.setEmptyView(progressBar);
+
+        // Must add the progress bar to the root of the layout
+        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+        root.addView(progressBar);
 
         FeedObtainer obtainer = new FeedObtainer();
         obtainer.execute("https://tech.onliner.by/feed");
