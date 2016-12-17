@@ -8,9 +8,15 @@
     tools:context="com.nikitagusarov.news.ListActivity"
     tools:showIn="@layout/app_bar_list">
 
-    <ListView
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/feedItemsList">
-    </ListView>
+        android:layout_height="match_parent">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/feedItemsList">
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

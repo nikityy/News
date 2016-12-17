@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -26,9 +27,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     ArrayAdapter<FeedItem> feedListAdapter;
+    SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +65,11 @@ public class ListActivity extends AppCompatActivity
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
         root.addView(progressBar);
 
-        FeedObtainer obtainer = new FeedObtainer();
-        obtainer.execute("https://tech.onliner.by/feed");
+        // Init swipe container
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(this);
+
+        updateFeed();
     }
 
     @Override
@@ -123,6 +129,16 @@ public class ListActivity extends AppCompatActivity
         return true;
     }
 
+    private void updateFeed() {
+        FeedObtainer obtainer = new FeedObtainer();
+        obtainer.execute("https://tech.onliner.by/feed");
+    }
+
+    @Override
+    public void onRefresh() {
+        updateFeed();
+    }
+
     private class FeedObtainer extends AsyncTask<String, Void, Feed> {
 
         @Override
@@ -137,10 +153,14 @@ public class ListActivity extends AppCompatActivity
             Iterator<FeedItem> iterator = feed.getMessages().iterator();
             FeedItem item;
 
+            feedListAdapter.clear();
+
             while(iterator.hasNext()) {
                 item = iterator.next();
                 feedListAdapter.add(item);
             }
+
+            swipeContainer.setRefreshing(false);
         }
 
     }
