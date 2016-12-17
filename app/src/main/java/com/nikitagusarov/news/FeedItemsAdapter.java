@@ -42,9 +42,14 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.title.setText(feedItem.title);
-        holder.pubDate.setText(dateFormat.format(feedItem.pubDate));
-        holder.imageView.setTag(position);
+        try {
+            holder.title.setText(feedItem.title);
+            holder.pubDate.setText(dateFormat.format(feedItem.pubDate));
+            holder.imageView.setTag(position);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
 
         if (feedItem.imageURL != null) {
             new LoadImageTask(new ImageLoadController(position, holder)).execute(feedItem.imageURL);
@@ -65,7 +70,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
         }
 
         public void onImageLoaded(Bitmap bitmap) {
-            if (bitmap != null && this.position == (int) holder.imageView.getTag()) {
+            if (bitmap != null && holder.imageView != null && this.position == (int) holder.imageView.getTag()) {
                 holder.imageView.setImageBitmap(bitmap);
             } else {
                 holder.imageView.setImageBitmap(null);
