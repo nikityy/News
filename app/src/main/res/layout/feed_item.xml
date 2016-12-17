@@ -31,8 +31,22 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:maxLines="2"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="6dp"
+                android:paddingTop="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Large Text"
+                android:id="@+id/feedItemPubDate"
+                android:textSize="12sp"
+                android:maxLines="2"
                 android:minLines="2"
-                android:padding="10dp" />
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
         </LinearLayout>
 
 

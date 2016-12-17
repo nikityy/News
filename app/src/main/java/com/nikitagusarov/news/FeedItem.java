@@ -1,5 +1,7 @@
 package com.nikitagusarov.news;
 
+import java.util.Date;
+
 /**
  * Created by mac on 17/12/2016.
  */
@@ -9,7 +11,7 @@ public class FeedItem {
     String description;
     String link;
     String author;
-    String guid;
+    Date pubDate;
     String imageURL;
 
     public String getTitle() {
@@ -28,6 +30,14 @@ public class FeedItem {
         this.description = description;
     }
 
+    public Date getPubDate() {
+        return pubDate;
+    }
+
+    public void setPubDate(Date pubDate) {
+        this.pubDate = pubDate;
+    }
+
     public String getImageURL() {
         return imageURL;
     }
@@ -39,7 +49,7 @@ public class FeedItem {
     @Override
     public String toString() {
         return "FeedMessage [title=" + title + ", description=" + description
-                + ", link=" + link + ", author=" + author + ", guid=" + guid
+                + ", link=" + link + ", author=" + author + ", "
                 + "]";
     }
 

@@ -9,13 +9,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
  * Created by mac on 17/12/2016.
  */
 public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMMM HH:mm");
 
     public FeedItemsAdapter(Context context, ArrayList<FeedItem> feedItems) {
         super(context, 0, feedItems);
@@ -30,6 +35,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.feed_item, null);
             holder = new ViewHolder();
             holder.title = (TextView) convertView.findViewById(R.id.feedItemTitle);
+            holder.pubDate = (TextView) convertView.findViewById(R.id.feedItemPubDate);
             holder.imageView = (ImageView) convertView.findViewById(R.id.feedItemImage);
             convertView.setTag(holder);
         } else {
@@ -37,6 +43,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
         }
 
         holder.title.setText(feedItem.title);
+        holder.pubDate.setText(dateFormat.format(feedItem.pubDate));
         holder.imageView.setTag(position);
 
         if (feedItem.imageURL != null) {
@@ -72,6 +79,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
 
     static class ViewHolder {
         TextView title;
+        TextView pubDate;
         ImageView imageView;
     }
 }

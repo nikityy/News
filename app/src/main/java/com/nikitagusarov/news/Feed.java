@@ -3,6 +3,7 @@ package com.nikitagusarov.news;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,10 +29,11 @@ public class Feed {
         }
     }
 
-    public void addItem(String title, String description, String imageURL) {
+    public void addItem(String title, String description, Date pubDate, String imageURL) {
         FeedItem item = new FeedItem();
         item.setTitle(title);
         item.setDescription(description);
+        item.setPubDate(pubDate);
         item.setImageURL(imageURL);
         entries.add(item);
     }

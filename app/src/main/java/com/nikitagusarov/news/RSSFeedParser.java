@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -65,11 +68,15 @@ public class RSSFeedParser {
 
     private class RSSHandler extends DefaultHandler {
 
+        final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+
         boolean isTitle = false;
         boolean isDescription = false;
+        boolean isPubDate = false;
 
         String title;
         String description;
+        Date pubDate;
         String imageURL;
 
         public void startElement(String uri, String localName, String qName,
@@ -77,6 +84,7 @@ public class RSSFeedParser {
             if (localName.equals(ITEM)) {
                 isTitle = false;
                 isDescription = false;
+                isPubDate = false;
             }
 
             if (localName.equals(TITLE)) {
@@ -87,6 +95,10 @@ public class RSSFeedParser {
                 isDescription = true;
             }
 
+            if (localName.equals(PUB_DATE)) {
+                isPubDate = true;
+            }
+
             if (localName.equals(IMAGE)) {
                 imageURL = attrs.getValue("url");
             }
@@ -95,9 +107,10 @@ public class RSSFeedParser {
         public void endElement(String namespaceURI, String localName,
                                String qName) throws SAXException {
             if (localName.equals(ITEM)) {
-                feed.addItem(title, description, imageURL);
+                feed.addItem(title, description, pubDate, imageURL);
                 title = null;
                 description = null;
+                pubDate = null;
                 imageURL = null;
             }
         }
@@ -112,6 +125,16 @@ public class RSSFeedParser {
             if (isDescription) {
                 description = new String(ch, start, length);
                 isDescription = false;
+            }
+
+            if (isPubDate) {
+                try {
+                    pubDate = format.parse(new String(ch, start, length));
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                }
+                isPubDate = false;
             }
         }
 
