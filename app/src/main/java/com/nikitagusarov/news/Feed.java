@@ -28,10 +28,11 @@ public class Feed {
         }
     }
 
-    public void addItem(String title, String description) {
+    public void addItem(String title, String description, String imageURL) {
         FeedItem item = new FeedItem();
         item.setTitle(title);
         item.setDescription(description);
+        item.setImageURL(imageURL);
         entries.add(item);
     }
 

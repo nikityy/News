@@ -30,6 +30,7 @@ public class RSSFeedParser {
     static final String ITEM = "item";
     static final String PUB_DATE = "pubDate";
     static final String GUID = "guid";
+    static final String IMAGE = "thumbnail";
 
     final private Feed feed;
     final private URL url;
@@ -69,6 +70,7 @@ public class RSSFeedParser {
 
         String title;
         String description;
+        String imageURL;
 
         public void startElement(String uri, String localName, String qName,
                                  Attributes attrs) throws SAXException {
@@ -84,14 +86,19 @@ public class RSSFeedParser {
             if (localName.equals(DESCRIPTION)) {
                 isDescription = true;
             }
+
+            if (localName.equals(IMAGE)) {
+                imageURL = attrs.getValue("url");
+            }
         }
 
         public void endElement(String namespaceURI, String localName,
                                String qName) throws SAXException {
             if (localName.equals(ITEM)) {
-                feed.addItem(title, description);
+                feed.addItem(title, description, imageURL);
                 title = null;
                 description = null;
+                imageURL = null;
             }
         }
 

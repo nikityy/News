@@ -1,5 +1,6 @@
 package com.nikitagusarov.news;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -183,4 +184,5 @@ public class ListActivity extends AppCompatActivity
         }
 
     }
+
 }

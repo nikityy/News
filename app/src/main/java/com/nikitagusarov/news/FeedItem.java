@@ -10,6 +10,7 @@ public class FeedItem {
     String link;
     String author;
     String guid;
+    String imageURL;
 
     public String getTitle() {
         return title;
@@ -27,28 +28,12 @@ public class FeedItem {
         this.description = description;
     }
 
-    public String getLink() {
-        return link;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getGuid() {
-        return guid;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     @Override
