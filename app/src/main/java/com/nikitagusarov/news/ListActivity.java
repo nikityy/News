@@ -2,12 +2,8 @@ package com.nikitagusarov.news;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Gravity;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,12 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -30,7 +23,12 @@ public class ListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener {
 
-    ArrayAdapter<FeedItem> feedListAdapter;
+
+    final FeedList feedList = new FeedList();
+    Feed currentFeed;
+
+    NavigationView navigationView;
+    FeedItemsAdapter feedItemsAdapter;
     SwipeRefreshLayout swipeContainer;
 
     @Override
@@ -46,13 +44,40 @@ public class ListActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        // TEMP
+        Feed onlinerFeed = new Feed("Onliner", "https://tech.onliner.by/feed");
+        Feed ilyaBirmanFeed = new Feed("Илья Бирман", "http://ilyabirman.ru/meanwhile/rss/");
+        feedList.add(onlinerFeed);
+        feedList.add(ilyaBirmanFeed);
+
+        currentFeed = onlinerFeed;
+
+        initNavigationMenu();
+        initFeedItemsList();
+
+        updateFeed();
+    }
+
+    private void initNavigationMenu() {
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        feedListAdapter = new FeedItemsAdapter(this, new ArrayList<FeedItem>());
+        Menu menu = navigationView.getMenu();
+        Iterator<Feed> iterator = feedList.getList().iterator();
+        Feed feed;
+        MenuItem menuItem;
 
+        while(iterator.hasNext()) {
+            feed = iterator.next();
+            menuItem = menu.add(0, feed.id, feed.id, feed.title);
+            menuItem.setCheckable(true);
+        }
+    }
+
+    private void initFeedItemsList() {
+        feedItemsAdapter = new FeedItemsAdapter(this, new ArrayList<FeedItem>());
         ListView feedItemsList = (ListView) findViewById(R.id.feedItemsList);
-        feedItemsList.setAdapter(feedListAdapter);
+        feedItemsList.setAdapter(feedItemsAdapter);
 
         // Create a progress bar to display while the list loads
         ProgressBar progressBar = new ProgressBar(feedItemsList.getContext());
@@ -68,8 +93,6 @@ public class ListActivity extends AppCompatActivity
         // Init swipe container
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(this);
-
-        updateFeed();
     }
 
     @Override
@@ -86,6 +109,7 @@ public class ListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list, menu);
+
         return true;
     }
 
@@ -110,18 +134,13 @@ public class ListActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        navigationView.setCheckedItem(id);
+        Feed feed = feedList.getFeedById(id);
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (feed != null) {
+            currentFeed = feed;
+            feedItemsAdapter.clear();
+            updateFeed();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -131,7 +150,7 @@ public class ListActivity extends AppCompatActivity
 
     private void updateFeed() {
         FeedObtainer obtainer = new FeedObtainer();
-        obtainer.execute("https://tech.onliner.by/feed");
+        obtainer.execute(currentFeed);
     }
 
     @Override
@@ -139,10 +158,10 @@ public class ListActivity extends AppCompatActivity
         updateFeed();
     }
 
-    private class FeedObtainer extends AsyncTask<String, Void, Feed> {
+    private class FeedObtainer extends AsyncTask<Feed, Void, Feed> {
 
         @Override
-        protected Feed doInBackground(String... params) {
+        protected Feed doInBackground(Feed... params) {
             RSSFeedParser parser = new RSSFeedParser(params[0]);
             Feed feed = parser.readFeed();
             return feed;
@@ -153,11 +172,11 @@ public class ListActivity extends AppCompatActivity
             Iterator<FeedItem> iterator = feed.getMessages().iterator();
             FeedItem item;
 
-            feedListAdapter.clear();
+            feedItemsAdapter.clear();
 
             while(iterator.hasNext()) {
                 item = iterator.next();
-                feedListAdapter.add(item);
+                feedItemsAdapter.add(item);
             }
 
             swipeContainer.setRefreshing(false);

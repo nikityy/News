@@ -31,19 +31,17 @@ public class RSSFeedParser {
     static final String PUB_DATE = "pubDate";
     static final String GUID = "guid";
 
+    final private Feed feed;
     final private URL url;
 
-    final private Feed feed = new Feed();
-
-    public RSSFeedParser(String feedUrl) {
-        try {
-            this.url = new URL(feedUrl);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+    public RSSFeedParser(Feed feed) {
+            this.feed = feed;
+            this.url = feed.url;
     }
 
     public Feed readFeed() {
+        feed.getMessages().clear();
+
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
