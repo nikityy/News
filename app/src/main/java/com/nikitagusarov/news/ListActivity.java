@@ -1,9 +1,11 @@
 package com.nikitagusarov.news;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Gravity;
 import android.support.design.widget.NavigationView;
@@ -20,6 +22,7 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class ListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -33,7 +36,9 @@ public class ListActivity extends AppCompatActivity
     FeedItemsAdapter feedItemsAdapter;
     SwipeRefreshLayout swipeContainer;
 
-    final int ADD_SUBSCRIPTION_ID = -42;
+    SharedPreferences preferences;
+
+    final int ADD_SUBSCRIPTION_ID = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +53,21 @@ public class ListActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String serializedFeedList = preferences.getString("subscriptions", "");
         feedList = FeedList.parse(serializedFeedList);
 
-
         if (!feedList.getList().isEmpty()) {
-            currentFeed = feedList.getList().get(0);
+            Intent intent = getIntent();
+            int id = intent.getIntExtra("subscriptionId", -1);
+
+            System.out.println(id);
+
+            if (id != -1) {
+                currentFeed = feedList.getFeedById(id);
+            } else {
+                currentFeed = feedList.getList().get(0);
+            }
         }
 
         initNavigationMenu();
@@ -77,9 +89,10 @@ public class ListActivity extends AppCompatActivity
             feed = iterator.next();
             menuItem = menu.add(0, feed.id, feed.id, feed.title);
             menuItem.setCheckable(true);
+            menuItem.setChecked(currentFeed == feed);
         }
 
-        menu.add(ADD_SUBSCRIPTION_ID, ADD_SUBSCRIPTION_ID, ADD_SUBSCRIPTION_ID, "Add Subscription");
+        menu.add(1, ADD_SUBSCRIPTION_ID, ADD_SUBSCRIPTION_ID, "Add Subscription");
     }
 
     private void initFeedItemsList() {
@@ -87,16 +100,18 @@ public class ListActivity extends AppCompatActivity
         ListView feedItemsList = (ListView) findViewById(R.id.feedItemsList);
         feedItemsList.setAdapter(feedItemsAdapter);
 
-        // Create a progress bar to display while the list loads
-        ProgressBar progressBar = new ProgressBar(feedItemsList.getContext());
-        progressBar.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT,
-                DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        progressBar.setIndeterminate(true);
-        feedItemsList.setEmptyView(progressBar);
+        if (!feedList.getList().isEmpty()) {
+            // Create a progress bar to display while the list loads
+            ProgressBar progressBar = new ProgressBar(feedItemsList.getContext());
+            progressBar.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT,
+                    DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+            progressBar.setIndeterminate(true);
+            feedItemsList.setEmptyView(progressBar);
 
-        // Must add the progress bar to the root of the layout
-        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        root.addView(progressBar);
+            // Must add the progress bar to the root of the layout
+            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            root.addView(progressBar);
+        }
 
         // Init swipe container
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -118,6 +133,10 @@ public class ListActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list, menu);
 
+        if (feedList.getList().isEmpty()) {
+            menu.findItem(R.id.action_remove).setEnabled(false);
+        }
+
         return true;
     }
 
@@ -129,21 +148,28 @@ public class ListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_remove) {
+            int index = feedList.getList().indexOf(currentFeed);
+            feedList.getList().remove(index);
+            preferences.edit().putString("subscriptions", feedList.toString()).commit();
+
+            Intent intent = new Intent(this, ListActivity.class);
+            finish();
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == ADD_SUBSCRIPTION_ID) {
-            
+            Intent intent = new Intent(this, NewSubscriptionActivity.class);
+            startActivity(intent);
         } else {
             navigationView.setCheckedItem(id);
             Feed feed = feedList.getFeedById(id);
