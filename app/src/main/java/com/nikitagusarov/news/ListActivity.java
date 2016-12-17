@@ -1,5 +1,6 @@
 package com.nikitagusarov.news;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,12 +26,14 @@ public class ListActivity extends AppCompatActivity
         SwipeRefreshLayout.OnRefreshListener {
 
 
-    final FeedList feedList = new FeedList();
+    FeedList feedList;
     Feed currentFeed;
 
     NavigationView navigationView;
     FeedItemsAdapter feedItemsAdapter;
     SwipeRefreshLayout swipeContainer;
+
+    final int ADD_SUBSCRIPTION_ID = -42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,15 @@ public class ListActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        // TEMP
-        Feed onlinerFeed = new Feed("Onliner", "https://tech.onliner.by/feed");
-        Feed ilyaBirmanFeed = new Feed("Илья Бирман", "http://ilyabirman.ru/meanwhile/rss/");
-        feedList.add(onlinerFeed);
-        feedList.add(ilyaBirmanFeed);
 
-        currentFeed = onlinerFeed;
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        String serializedFeedList = preferences.getString("subscriptions", "");
+        feedList = FeedList.parse(serializedFeedList);
+
+
+        if (!feedList.getList().isEmpty()) {
+            currentFeed = feedList.getList().get(0);
+        }
 
         initNavigationMenu();
         initFeedItemsList();
@@ -73,6 +78,8 @@ public class ListActivity extends AppCompatActivity
             menuItem = menu.add(0, feed.id, feed.id, feed.title);
             menuItem.setCheckable(true);
         }
+
+        menu.add(ADD_SUBSCRIPTION_ID, ADD_SUBSCRIPTION_ID, ADD_SUBSCRIPTION_ID, "Add Subscription");
     }
 
     private void initFeedItemsList() {
@@ -135,13 +142,17 @@ public class ListActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        navigationView.setCheckedItem(id);
-        Feed feed = feedList.getFeedById(id);
+        if (id == ADD_SUBSCRIPTION_ID) {
+            
+        } else {
+            navigationView.setCheckedItem(id);
+            Feed feed = feedList.getFeedById(id);
 
-        if (feed != null) {
-            currentFeed = feed;
-            feedItemsAdapter.clear();
-            updateFeed();
+            if (feed != null) {
+                currentFeed = feed;
+                feedItemsAdapter.clear();
+                updateFeed();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -150,6 +161,10 @@ public class ListActivity extends AppCompatActivity
     }
 
     private void updateFeed() {
+        if (currentFeed == null) {
+            return;
+        }
+
         FeedObtainer obtainer = new FeedObtainer();
         obtainer.execute(currentFeed);
     }

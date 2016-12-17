@@ -32,4 +32,39 @@ public class FeedList {
         return null;
     }
 
+    public String toString() {
+        Iterator<Feed> iterator = getList().iterator();
+        String string = "";
+
+        Feed feed;
+        while(iterator.hasNext()) {
+            feed = iterator.next();
+            string += feed.toString() + ",";
+        }
+
+        return string;
+    }
+
+    public static FeedList parse(String rawString) {
+        String[] strings = rawString.split(",");
+        FeedList feedList = new FeedList();
+        ArrayList<Feed> feeds = feedList.getList();
+        Feed feed;
+
+        for (int i = 0; i < strings.length; i++) {
+            try {
+                feed = Feed.parse(strings[i]);
+
+                if (feed != null) {
+                    feeds.add(feed);
+                }
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return feedList;
+    }
+
 }

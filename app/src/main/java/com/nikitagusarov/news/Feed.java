@@ -42,4 +42,26 @@ public class Feed {
         return entries;
     }
 
+    public String toString() {
+        return id + "::" + title + "::";
+    }
+
+    public static Feed parse(String rawString) {
+        Feed feed = null;
+        try {
+            String[] tokens = rawString.split("::");
+            int id = Integer.parseInt(tokens[0]);
+            String title = tokens[1];
+            String url = tokens[2];
+
+            feed = new Feed(title, url);
+            feed.id = id;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return feed;
+    }
+
 }
