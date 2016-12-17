@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class NewSubscriptionActivity extends AppCompatActivity {
 
     EditText subscriptionTitle;
@@ -16,6 +19,16 @@ public class NewSubscriptionActivity extends AppCompatActivity {
 
     FeedList feedList;
     SharedPreferences preferences;
+
+    final int predefinedItemsCount = 2;
+    String[] predefinedTitles = {
+            "Onliner",
+            "TUT.BY"
+    };
+    String[] predefinedURLs = {
+            "https://www.onliner.by/feed",
+            "https://news.tut.by/rss/index.rss"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +39,10 @@ public class NewSubscriptionActivity extends AppCompatActivity {
         String serializedFeedList = preferences.getString("subscriptions", "");
         feedList = FeedList.parse(serializedFeedList);
 
-        preferences.edit().putString("subscriptions", "").commit();
-
         subscriptionTitle = (EditText) findViewById(R.id.newSubscriptionTitle);
         subscriptionURL = (EditText) findViewById(R.id.newSubscriptionURL);
 
-        subscriptionTitle.setText("Onliner");
-        subscriptionURL.setText("https://tech.onliner.by/feed");
+        setPredefinedRandomFeed();
     }
 
     public void addNewSubscription(View view) {
@@ -52,5 +62,11 @@ public class NewSubscriptionActivity extends AppCompatActivity {
         catch(Exception e) {
             Toast.makeText(this, "Invalid URL.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setPredefinedRandomFeed() {
+        int randomIndex = new Random().nextInt(predefinedItemsCount);
+        subscriptionTitle.setText(predefinedTitles[randomIndex]);
+        subscriptionURL.setText(predefinedURLs[randomIndex]);
     }
 }
