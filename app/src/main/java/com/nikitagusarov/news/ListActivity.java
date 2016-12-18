@@ -211,17 +211,22 @@ public class ListActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Feed feed) {
-            Iterator<FeedItem> iterator = feed.getMessages().iterator();
-            FeedItem item;
+            try {
+                Iterator<FeedItem> iterator = feed.getMessages().iterator();
+                FeedItem item;
 
-            feedItemsAdapter.clear();
+                feedItemsAdapter.clear();
 
-            while(iterator.hasNext()) {
-                item = iterator.next();
-                feedItemsAdapter.add(item);
+                while(iterator.hasNext()) {
+                    item = iterator.next();
+                    feedItemsAdapter.add(item);
+                }
+
+                swipeContainer.setRefreshing(false);
             }
-
-            swipeContainer.setRefreshing(false);
+            catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }

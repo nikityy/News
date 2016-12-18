@@ -53,8 +53,6 @@ public class FeedList {
 
         for (int i = 0; i < strings.length; i++) {
             try {
-                System.out.println(strings[i]);
-                System.out.println("HUY");
                 feed = Feed.parse(strings[i]);
 
                 if (feed != null) {

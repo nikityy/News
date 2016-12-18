@@ -29,11 +29,12 @@ public class Feed {
         }
     }
 
-    public void addItem(String title, String description, Date pubDate, String imageURL) {
+    public void addItem(String title, String description, Date pubDate, String url, String imageURL) {
         FeedItem item = new FeedItem();
         item.setTitle(title);
         item.setDescription(description);
         item.setPubDate(pubDate);
+        item.setURL(url);
         item.setImageURL(imageURL);
         entries.add(item);
     }

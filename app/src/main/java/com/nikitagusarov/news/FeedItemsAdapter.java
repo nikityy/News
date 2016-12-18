@@ -46,13 +46,13 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
             holder.title.setText(feedItem.title);
             holder.pubDate.setText(dateFormat.format(feedItem.pubDate));
             holder.imageView.setTag(position);
+
+            if (feedItem.imageURL != null) {
+                new LoadImageTask(new ImageLoadController(position, holder)).execute(feedItem.imageURL);
+            }
         }
         catch(Exception e) {
             e.printStackTrace();
-        }
-
-        if (feedItem.imageURL != null) {
-            new LoadImageTask(new ImageLoadController(position, holder)).execute(feedItem.imageURL);
         }
 
         return convertView;
@@ -70,10 +70,17 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
         }
 
         public void onImageLoaded(Bitmap bitmap) {
-            if (bitmap != null && holder != null && holder.imageView != null && this.position == (int) holder.imageView.getTag()) {
-                holder.imageView.setImageBitmap(bitmap);
-            } else {
-                holder.imageView.setImageBitmap(null);
+            if (bitmap != null && holder != null && holder.imageView != null) {
+                try {
+                    if (this.position == (int) holder.imageView.getTag()) {
+                        holder.imageView.setImageBitmap(bitmap);
+                    } else {
+                        holder.imageView.setImageBitmap(null);
+                    }
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
 

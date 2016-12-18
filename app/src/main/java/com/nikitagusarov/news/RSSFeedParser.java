@@ -73,11 +73,13 @@ public class RSSFeedParser {
         boolean isTitle = false;
         boolean isDescription = false;
         boolean isPubDate = false;
+        boolean isURL = false;
 
         String title;
         String description;
         Date pubDate;
         String imageURL;
+        String url;
 
         public void startElement(String uri, String localName, String qName,
                                  Attributes attrs) throws SAXException {
@@ -85,6 +87,7 @@ public class RSSFeedParser {
                 isTitle = false;
                 isDescription = false;
                 isPubDate = false;
+                isURL = false;
             }
 
             if (localName.equals(TITLE)) {
@@ -99,6 +102,10 @@ public class RSSFeedParser {
                 isPubDate = true;
             }
 
+            if (localName.equals(LINK)) {
+                isURL = true;
+            }
+
             if (localName.equals(IMAGE)) {
                 imageURL = attrs.getValue("url");
             }
@@ -107,10 +114,11 @@ public class RSSFeedParser {
         public void endElement(String namespaceURI, String localName,
                                String qName) throws SAXException {
             if (localName.equals(ITEM)) {
-                feed.addItem(title, description, pubDate, imageURL);
+                feed.addItem(title, description, pubDate, url, imageURL);
                 title = null;
                 description = null;
                 pubDate = null;
+                url = null;
                 imageURL = null;
             }
         }
@@ -135,6 +143,11 @@ public class RSSFeedParser {
                     e.printStackTrace();
                 }
                 isPubDate = false;
+            }
+
+            if (isURL) {
+                url = new String(ch, start, length);
+                isURL = false;
             }
         }
 

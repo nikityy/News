@@ -13,6 +13,7 @@ public class FeedItem {
     String author;
     Date pubDate;
     String imageURL;
+    String url;
 
     public String getTitle() {
         return title;
@@ -44,6 +45,14 @@ public class FeedItem {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getURL() {
+        return url;
+    }
+
+    public void setURL(String url) {
+        this.url = url;
     }
 
     @Override
