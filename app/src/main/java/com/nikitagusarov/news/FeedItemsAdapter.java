@@ -44,6 +44,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
 
         try {
             holder.title.setText(feedItem.title);
+            holder.title.setTag(feedItem.url);
             holder.pubDate.setText(dateFormat.format(feedItem.pubDate));
             holder.imageView.setTag(position);
 

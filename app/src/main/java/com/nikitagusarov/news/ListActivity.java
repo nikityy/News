@@ -16,9 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,7 +29,8 @@ import java.util.List;
 
 public class ListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener,
+        AdapterView.OnItemClickListener {
 
 
     FeedList feedList;
@@ -99,6 +103,7 @@ public class ListActivity extends AppCompatActivity
         feedItemsAdapter = new FeedItemsAdapter(this, new ArrayList<FeedItem>());
         ListView feedItemsList = (ListView) findViewById(R.id.feedItemsList);
         feedItemsList.setAdapter(feedItemsAdapter);
+        feedItemsList.setOnItemClickListener(this);
 
         if (!feedList.getList().isEmpty()) {
             // Create a progress bar to display while the list loads
@@ -184,6 +189,20 @@ public class ListActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void onItemClick(AdapterView adapterView, View itemView, int id, long offset) {
+        try {
+            TextView title = (TextView) itemView.findViewById(R.id.feedItemTitle);
+            String url = (String) title.getTag();
+
+            Intent intent = new Intent(this, ArticleActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateFeed() {
