@@ -70,7 +70,7 @@ public class FeedItemsAdapter extends ArrayAdapter<FeedItem> {
         }
 
         public void onImageLoaded(Bitmap bitmap) {
-            if (bitmap != null && holder.imageView != null && this.position == (int) holder.imageView.getTag()) {
+            if (bitmap != null && holder != null && holder.imageView != null && this.position == (int) holder.imageView.getTag()) {
                 holder.imageView.setImageBitmap(bitmap);
             } else {
                 holder.imageView.setImageBitmap(null);
