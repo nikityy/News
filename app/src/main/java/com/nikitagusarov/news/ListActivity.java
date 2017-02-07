@@ -109,8 +109,9 @@ public class ListActivity extends AppCompatActivity
             // Create a progress bar to display while the list loads
             ProgressBar progressBar = new ProgressBar(feedItemsList.getContext());
             progressBar.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT,
-                    DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+                    DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.VERTICAL_GRAVITY_MASK | Gravity.HORIZONTAL_GRAVITY_MASK));
             progressBar.setIndeterminate(true);
+            progressBar.setPadding(5, 5, 0, 0);
             feedItemsList.setEmptyView(progressBar);
 
             // Must add the progress bar to the root of the layout
